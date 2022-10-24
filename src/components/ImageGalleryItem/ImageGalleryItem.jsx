@@ -1,11 +1,11 @@
 import PropTypes from 'prop-types';
-import s from './ImageGalleryItem.module.scss';
+import css from './ImageGalleryItem.module.scss';
 
 export const ImageGalleryItem = ({ image, largeImageURL }, key) => {
   return (
-    <li key={key} className={s.GalleryItem}>
+    <li key={key} className={css.GalleryItem}>
       <img
-        className={s.GalleryItemImage}
+        className={css.GalleryItemImage}
         src={image}
         alt=""
         data-url={largeImageURL}

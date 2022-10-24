@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -11,104 +11,83 @@ import { ButtonLoader } from './Button/Button';
 import { Modal } from './Modal/Modal';
 import { Notification } from './Notification/Notification';
 
-export class App extends Component {
-  state = {
-    imagesPerPage: 12,
-    images: [],
-    query: '',
-    page: 1,
-    error: null,
-    notFound: false,
-    isLoading: false,
-    imageInModal: null,
-    imagesQuantity: null,
-  };
+export const App = () => {
+  const imagesPerPage = 12;
+  const [images, setImages] = useState([]);
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [error, setError] = useState(null);
+  const [notFound, setNotFound] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [imageInModal, setImageInModal] = useState(null);
+  const [imagesQuantity, setImagesQuantity] = useState(null);
 
-  componentDidUpdate(prevProps, prevState) {
-    const { query, page, imagesPerPage } = this.state;
-    if (prevState.query !== query || prevState.page !== page) {
-      this.imgFromApi(query, page, imagesPerPage);
+  useEffect(() => {
+    if (query === '') {
+      return;
     }
-  }
+    imgFromApi(query, page, imagesPerPage);
+  }, [query, page]);
 
-  imgFromApi = async (query, page, imagesPerPage) => {
-    this.setState({ notFound: false, error: null, isLoading: true });
+  const imgFromApi = async (query, page, imagesPerPage) => {
+    setNotFound(false);
+    setError(null);
+    setIsLoading(true);
+
     try {
       const data = await requestApi(query, page, imagesPerPage);
       const apiImages = data.hits;
       const totalHits = data.totalHits;
+
       if (apiImages.length) {
-        this.setState(prevState => ({
-          images: [...prevState.images, ...maper(apiImages)],
-          notFound: false,
-          imagesQuantity: totalHits,
-        }));
-      } else
-        this.setState({
-          images: [],
-          imagesQuantity: null,
-          notFound: true,
-        });
+        setImages(prevState => [...prevState, ...maper(apiImages)]);
+        setNotFound(false);
+        setImagesQuantity(totalHits);
+      } else {
+        setImages([]);
+        setNotFound(true);
+        setImagesQuantity(null);
+      }
     } catch (err) {
-      this.setState({
-        error: err.message,
-      });
+      setError(err.message);
     } finally {
-      this.setState({
-        isLoading: false,
-      });
+      setIsLoading(false);
     }
   };
 
-  onSubmit = query => {
-    this.setState({
-      images: [],
-      query,
-      page: 1,
-    });
+  const onSubmit = query => {
+    setImages([]);
+    setQuery(query);
+    setPage(1);
   };
 
-  nextPageHandler = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+  const nextPageHandler = () => {
+    setPage(prevState => prevState + 1);
   };
 
-  openModal = e => {
+  const openModal = e => {
     const imageInModal = e.target.dataset.url;
-    this.setState({ imageInModal: imageInModal });
+    setImageInModal(imageInModal);
   };
 
-  closeModal = () => {
-    this.setState({ imageInModal: null });
+  const closeModal = () => {
+    setImageInModal(null);
   };
 
-  render() {
-    const {
-      imagesPerPage,
-      images,
-      page,
-      error,
-      notFound,
-      isLoading,
-      imageInModal,
-      imagesQuantity,
-    } = this.state;
-    return (
-      <>
-        <ToastContainer position="top-center" autoClose={2000} />
-        <Searchbar onSubmit={this.onSubmit} />
-        {isLoading && <Loader />}
-        {error && <Notification msg={error} />}
-        {notFound && !error && (
-          <Notification msg={'Nothing found for your request'} />
-        )}
-        {<ImageGallery images={images} openModal={this.openModal} />}
-        {page < imagesQuantity / imagesPerPage && !isLoading && !error && (
-          <ButtonLoader nextPageHandler={this.nextPageHandler} />
-        )}
-        {imageInModal && (
-          <Modal url={imageInModal} closeModal={this.closeModal} />
-        )}
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <ToastContainer position="top-center" autoClose={2000} />
+      <Searchbar onSubmit={onSubmit} />
+      {isLoading && <Loader />}
+      {error && <Notification msg={error} />}
+      {notFound && !error && (
+        <Notification msg={'Nothing found for your request'} />
+      )}
+      {<ImageGallery images={images} openModal={openModal} />}
+      {page < imagesQuantity / imagesPerPage && !isLoading && !error && (
+        <ButtonLoader nextPageHandler={nextPageHandler} />
+      )}
+      {imageInModal && <Modal url={imageInModal} closeModal={closeModal} />}
+    </>
+  );
+};

@@ -1,19 +1,23 @@
 import PropTypes from 'prop-types';
 
 import { AiOutlineSearch } from 'react-icons/ai';
-import s from './Button.module.scss';
+import css from './Button.module.scss';
 
 export const ButtonSubmit = () => {
   return (
-    <button type="submit" className={s.buttonSubmit}>
-      <AiOutlineSearch className={s.buttonSubmitSvg} size={18} />
+    <button type="submit" className={css.buttonSubmit}>
+      <AiOutlineSearch className={css.buttonSubmitSvg} size={18} />
     </button>
   );
 };
 
 export const ButtonLoader = ({ nextPageHandler }) => {
   return (
-    <button type="button" className={s.ButtonLoader} onClick={nextPageHandler}>
+    <button
+      type="button"
+      className={css.ButtonLoader}
+      onClick={nextPageHandler}
+    >
       Load more
     </button>
   );

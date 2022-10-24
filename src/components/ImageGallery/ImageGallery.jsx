@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
-import s from './ImageGallery.module.scss';
+import css from './ImageGallery.module.scss';
 
 export const ImageGallery = ({ images, openModal }) => {
   return (
-    <ul className={s.ImageGallery} onClick={e => openModal(e)}>
+    <ul className={css.ImageGallery} onClick={e => openModal(e)}>
       {images.map(image => (
         <ImageGalleryItem
           key={image.id}
